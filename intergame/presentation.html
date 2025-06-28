@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Interactive Coding Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .challenge-list {
+            list-style: none;
+        }
+        
+        .challenge-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .challenge-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+            border-left-color: #ffd700;
+        }
+        
+        .challenge-item.active {
+            background: rgba(255,215,0,0.2);
+            border-left-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+        
+        .challenge-number {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 0.9em;
+        }
+        
+        .challenge-title {
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        
+        .challenge-difficulty {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .challenge-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .challenge-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .scenario-box {
+            background: linear-gradient(45deg, rgba(255,0,150,0.2), rgba(0,204,255,0.2));
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .task-box {
+            background: rgba(0,255,127,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(0,255,127,0.3);
+        }
+        
+        .tools-box {
+            background: rgba(255,165,0,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,165,0,0.3);
+        }
+        
+        .success-box {
+            background: rgba(50,205,50,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(50,205,50,0.3);
+        }
+        
+        .role {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .role h4 {
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .easy { background: rgba(50,205,50,0.3); }
+        .moderate { background: rgba(255,165,0,0.3); }
+        .hard { background: rgba(255,69,0,0.3); }
+        
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .welcome-screen {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .welcome-screen h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .welcome-screen p {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Interactive Coding Challenges</h1>
+            <div class="subtitle">20 Gamified Missions for 3-Member Teams</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <ul class="challenge-list" id="challengeList">
+                    <!-- Challenges will be populated by JavaScript -->
+                </ul>
+            </div>
+            
+            <div class="content-area" id="contentArea">
+                <div class="challenge-content active" id="welcome">
+                    <div class="welcome-screen">
+                        <h2>🚀 Welcome, Code Warriors!</h2>
+                        <p>Get ready for an epic journey through 20 interactive coding challenges designed to test your teamwork, problem-solving skills, and mastery of development tools!</p>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">👥</div>
+                                <h3>Team-Based</h3>
+                                <p>Designed specifically for 3-member teams with unique roles</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🎯</div>
+                                <h3>Interactive</h3>
+                                <p>Hands-on challenges with real tools and scenarios</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">⚔️</div>
+                                <h3>Gamified</h3>
+                                <p>Story-driven missions with creative themes</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🛠️</div>
+                                <h3>Multi-Tool</h3>
+                                <p>VS Code, Git, Linux Terminal, and more</p>
+                            </div>
+                        </div>
+                        
+                        <p><strong>Select a challenge from the sidebar to begin your mission!</strong></p>
+                        <p>Each challenge includes difficulty levels: <span class="difficulty-badge easy">Easy</span> <span class="difficulty-badge moderate">Moderate</span> <span class="difficulty-badge hard">Hard</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timer" id="timer">
+            <div>⏱️ Time Remaining: <span id="timeLeft">00:00</span></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="previousChallenge()">← Previous</button>
+            <button class="btn" onclick="nextChallenge()">Next →</button>
+            <button class="btn" onclick="startTimer()">🎯 Start Mission</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <script>
+        const challenges = [
+            {
+                id: 1,
+                title: "Repository Dungeon Escape",
+                difficulty: "easy",
+                scenario: "Your team is trapped in a magical Git repository where the only way out is to solve three ancient puzzles hidden in different branches. Each team member holds a piece of the escape key, but you can only combine them by working together!",
+                tasks: [
+                    {
+                        role: "🗺️ Explorer",
+                        description: "Navigate through different branches using VS Code's source control panel to find hidden clues in README files. You can see the files but cannot edit them."
+                    },
+                    {
+                        role: "🏺 Archaeologist", 
+                        description: "Use terminal commands to search through commit history and find specific commit messages containing puzzle pieces. You can only use the terminal, no GUI."
+                    },
+                    {
+                        role: "🔐 Keeper",
+                        description: "Must blindly follow teammates' instructions to create a final commit that combines all three clues into a single 'escape.txt' file. You cannot look at the screen!"
+                    }
+                ],
+                tools: "Git (branch switching, commit history, log commands), VS Code (source control panel, file navigation), Linux terminal (history commands, file creation)",
+                success: "Create a commit with message 'ESCAPED THE DUNGEON' containing a file with all three puzzle pieces combined",
+                timeLimit: 15
+            },
+            {
+                id: 2,
+                title: "The Great Code Heist",
+                difficulty: "moderate",
+                scenario: "A notorious bug has infiltrated your codebase and is hiding somewhere in the commit history. Your elite team of digital detectives must track it down using forensic Git tools before it corrupts the entire system!",
+                tasks: [
+                    {
+                        role: "🕵️ Detective Chief",
+                        description: "Use git blame and git log to identify which developer introduced the suspicious code. You coordinate the investigation but cannot touch the keyboard."
+                    },
+                    {
+                        role: "🔍 Forensic Analyst",
+                        description: "Execute git bisect to narrow down the exact commit where the bug was introduced. Follow only verbal instructions from the Detective Chief."
+                    },
+                    {
+                        role: "📝 Evidence Recorder",
+                        description: "Document all findings in a case-report.md file and create a git tag marking the criminal commit. You can only work when the other two give you permission."
+                    }
+                ],
+                tools: "Git (blame, log, bisect, tag), VS Code (editing, search), Linux terminal (file manipulation)",
+                success: "Create a git tag 'CRIMINAL_COMMIT' on the offending commit and submit a detailed case report with evidence",
+                timeLimit: 20
+            },
+            {
+                id: 3,
+                title: "Terminal Timebomb Defusal",
+                difficulty: "hard",
+                scenario: "A digital bomb has been planted in your system! It's set to go off in 10 minutes, and the only way to defuse it is by solving a series of terminal puzzles. One wrong command and BOOM! 💥",
+                tasks: [
+                    {
+                        role: "💣 Bomb Expert",
+                        description: "You have the bomb defusal manual but cannot touch the computer. Give precise instructions to defuse each stage using grep, find, and sed commands."
+                    },
+                    {
+                        role: "⌨️ Terminal Operator", 
+                        description: "Execute terminal commands exactly as instructed. One mistake resets the timer! You cannot see the defusal manual."
+                    },
+                    {
+                        role: "⏰ Time Keeper",
+                        description: "Monitor the countdown and system processes using htop/top. Alert the team when certain processes appear. You can only use monitoring tools."
+                    }
+                ],
+                tools: "Linux terminal (grep, find, sed, htop, ps, kill), VS Code (file viewing), system monitoring",
+                success: "Successfully defuse all bomb stages and create a 'DEFUSED.txt' file with the final disarm code",
+                timeLimit: 10
+            },
+            {
+                id: 4,
+                title: "Live Share Relay Race",
+                difficulty: "easy",
+                scenario: "The annual Inter-Galactic Coding Relay is here! Your team must pass a coding baton through VS Code Live Share, with each member contributing their part of the solution. But here's the twist - no verbal communication allowed! 🤐",
+                tasks: [
+                    {
+                        role: "🏃 Runner 1",
+                        description: "Start the Live Share session and write the first function. Leave comments for the next runner about what needs to be done, then step away from the keyboard."
+                    },
+                    {
+                        role: "🏃 Runner 2",
+                        description: "Join the Live Share, read the comments, complete the second function, and leave instructions for Runner 3. No talking allowed!"
+                    },
+                    {
+                        role: "🏃 Runner 3",
+                        description: "Join the session, complete the final function, run all tests, and commit the solution. Celebrate silently when tests pass!"
+                    }
+                ],
+                tools: "VS Code (Live Share extension, editing, commenting), Git (commit, push), testing frameworks",
+                success: "Complete a working program with all tests passing, committed by Runner 3 with message 'RELAY_COMPLETE'",
+                timeLimit: 25
+            },
+            {
+                id: 5,
+                title: "Debugger Duel Arena",
+                difficulty: "moderate",
+                scenario: "Welcome to the Debugger Colosseum! Your team faces a gladiatorial challenge against the most cunning bugs in the kingdom. Only by mastering the ancient art of breakpoint warfare can you emerge victorious! ⚔️",
+                tasks: [
+                    {
+                        role: "🛡️ Debug Commander",
+                        description: "Set strategic breakpoints in VS Code debugger and analyze variable values. You cannot modify any code, only observe and direct your team."
+                    },
+                    {
+                        role: "⚔️ Code Warrior",
+                        description: "Fix bugs based on Commander's findings. You can edit code but cannot use the debugger or console. Trust your Commander's intel completely."
+                    },
+                    {
+                        role: "📊 Battle Recorder",
+                        description: "Document each bug found and fixed in battle-log.md. Create git commits for each fix with descriptive messages. You cannot participate in debugging."
+                    }
+                ],
+                tools: "VS Code (debugger, breakpoints, watch panel), Git (commit with descriptive messages), file editing",
+                success: "Eliminate all bugs, create detailed battle log, and push commits with messages starting with 'BUG_SLAIN:'",
+                timeLimit: 30
+            },
+            {
+                id: 6,
+                title: "Stash Cache Treasure Hunt",
+                difficulty: "easy",
+                scenario: "Ahoy, digital pirates! 🏴‍☠️ A legendary developer has hidden treasure in the Git stash cache before disappearing. Your crew must navigate through multiple stashes to find the golden code artifacts!",
+                tasks: [
+                    {
+                        role: "🗺️ Navigator",
+                        description: "Use git stash list and git show to examine different stashes and find clues about the treasure locations. You can only read, not modify anything."
+                    },
+                    {
+                        role: "⚓ First Mate",
+                        description: "Apply specific stashes when the Navigator gives directions. Use git stash pop and git stash apply based on the treasure map instructions."
+                    },
+                    {
+                        role: "💰 Treasure Keeper",
+                        description: "Collect all treasure files found in stashes and create a treasure-inventory.txt file. Commit the final treasure collection."
+                    }
+                ],
+                tools: "Git (stash list, stash show, stash pop, stash apply), VS Code (file viewing, editing), Linux terminal",
+                success: "Recover all treasure files from stashes and create a complete inventory with commit message 'TREASURE_SECURED'",
+                timeLimit: 18
+            },
+            {
+                id: 7,
+                title: "Vim Escape Room Challenge",
+                difficulty: "hard",
+                scenario: "You've been trapped in the legendary Vim Escape Room! The only way out is to solve editing puzzles using Vim commands. One team member is locked in Vim, while others provide guidance from ancient scrolls! 📜",
+                tasks: [
+                    {
+                        role: "🗝️ Vim Prisoner",
+                        description: "You're stuck in Vim and must execute precise editing commands to solve puzzles. You cannot see the solution manual - rely completely on your teammates' guidance."
+                    },
+                    {
+                        role: "📜 Ancient Scholar",
+                        description: "You have the Vim command reference but cannot see the current editor state. Provide specific Vim commands based on updates from the Observer."
+                    },
+                    {
+                        role: "👁️ Observer",
+                        description: "Describe what you see on the Vim Prisoner's screen to the Ancient Scholar. You cannot suggest commands, only report the current state accurately."
+                    }
+                ],
+                tools: "Vim/Vi editor (modal editing, search, replace, macros), terminal navigation, file manipulation",
+                success: "Complete all editing challenges and save the final solution file with the escape sequence 'VIM_MASTER_ACHIEVED'",
+                timeLimit: 25
+            },
+            {
+                id: 8,
+                title: "Merge Conflict Gladiators",
+                difficulty: "moderate",
+                scenario: "The Great Git Colosseum presents: MERGE CONFLICT GLADIATORS! ⚔️ Your team must resolve epic battles between conflicting code branches while the crowd cheers (or boos) your decisions!",
+                tasks: [
+                    {
+                        role: "🏛️ Conflict Judge",
+                        description: "Analyze merge conflicts and decide which code should win each battle. You can examine files but cannot resolve conflicts directly - make verbal judgments only."
+                    },
+                    {
+                        role: "⚖️ Resolution Executor",
+                        description: "Carry out the Judge's decisions by editing files to resolve conflicts. You cannot see the original branches - trust the Judge's wisdom completely."
+                    },
+                    {
+                        role: "📯 Arena Announcer",
+                        description: "Document each conflict resolution in arena-battles.md and create commits with epic battle messages. Announce victories to the crowd (your teammates)!"
+                    }
+                ],
+                tools: "Git (merge, conflict resolution, diff), VS Code (merge conflict editor), file editing, commit creation",
+                success: "Resolve all merge conflicts, document each battle, and merge successfully with commit 'GLADIATORS_VICTORIOUS'",
+                timeLimit: 22
+            },
+            {
+                id: 9,
+                title: "Grep Detective Agency",
+                difficulty: "easy",
+                scenario: "The city's most perplexing case has landed on your detective agency's desk! 🕵️‍♀️ A master criminal has hidden clues throughout various files, and only the most skilled grep detectives can crack the case!",
+                tasks: [
+                    {
+                        role: "🔍 Chief Detective",
+                        description: "Design grep search patterns to find hidden clues in files. You know what to look for but cannot execute commands - direct your subordinates with precise search terms."
+                    },
+                    {
+                        role: "👮 Field Agent",
+                        description: "Execute grep commands and report findings back to the Chief. You can search but cannot interpret clues - just report raw results accurately."
+                    },
+                    {
+                        role: "📋 Case Officer",
+                        description: "Compile all found clues into a case-solution.txt file and piece together the criminal's master plan. Create evidence folders and organize findings."
+                    }
+                ],
+                tools: "Linux terminal (grep, find, cat, sort), VS Code (file viewing), file organization commands",
+                success: "Solve the case by finding all clues and create a complete criminal profile with evidence file 'CASE_CLOSED.txt'",
+                timeLimit: 16
+            },
+            {
+                id: 10,
+                title: "Tmux Terminal Circus",
+                difficulty: "moderate",
+                scenario: "Welcome to the most spectacular show on earth - the Tmux Terminal Circus! 🎪 Your team must coordinate a complex performance across multiple terminal panes and windows without missing a beat!",
+                tasks: [
+                    {
+                        role: "🎪 Ringmaster",
+                        description: "Create and manage tmux sessions, windows, and panes. Orchestrate the entire performance but cannot perform individual acts - only set up the stage and give cues."
+                    },
+                    {
+                        role: "🤹 Performer A",
+                        description: "Execute commands in designated tmux panes when cued by the Ringmaster. You must perform in sync with Performer B but cannot see their panes."
+                    },
+                    {
+                        role: "🤹 Performer B", 
+                        description: "Execute complementary commands in other tmux panes. Your actions must coordinate with Performer A to create the complete circus act."
+                    }
+                ],
+                tools: "Tmux/Byobu (session management, panes, windows), Linux terminal (various commands), process management",
+                success: "Complete a synchronized terminal performance across multiple panes and save session as 'CIRCUS_SPECTACULAR'",
+                timeLimit: 20
+            },
+            {
+                id: 11,
+                title: "Extension Expedition",
+                difficulty: "easy",
+                scenario: "A mysterious developer has left behind a trail of VS Code extensions that, when used together, reveal the location of the legendary Code Crystal! 💎 Your team must become extension explorers to uncover this digital treasure!",
+                tasks: [
+                    {
+                        role: "🧭 Extension Navigator",
+                        description: "Install and explore different VS Code extensions to find hidden features and clues. You can browse and install but cannot use them - report discoveries to teammates."
+                    },
+                    {
+                        role: "🔬 Feature Scientist",
+                        description: "Use the installed extensions to perform specific tasks and experiments. Follow the Navigator's guidance but cannot install extensions yourself."
+                    },
+                    {
+                        role: "📚 Code Historian",
+                        description: "Document how each extension contributed to finding the crystal and create a crystal-discovery-log.md file. You cannot use extensions, only record findings."
+                    }
+                ],
+                tools: "VS Code (extensions marketplace, various extensions), file editing, documentation creation",
+                success: "Use at least 5 different extensions to solve puzzles and document the complete expedition in discovery log",
+                timeLimit: 28
+            },
+            {
+                id: 12,
+                title: "Bisect Binary Search Quest",
+                difficulty: "hard",
+                scenario: "The Kingdom of Code is under attack by a terrible regression dragon! 🐉 The beast appeared sometime in the last 50 commits, and only the ancient technique of git bisect can help you slay it before it destroys everything!",
+                tasks: [
+                    {
+                        role: "🏹 Dragon Hunter",
+                        description: "Lead the git bisect quest to track down the regression. You know the symptoms but cannot execute git commands - guide your squire with tactical decisions."
+                    },
+                    {
+                        role: "🛡️ Loyal Squire",
+                        description: "Execute git bisect commands as directed by the Dragon Hunter. Test each commit and report if the dragon is present. You cannot make strategic decisions independently."
+                    },
+                    {
+                        role: "📖 Court Chronicler",
+                        description: "Record the entire dragon hunt in a detailed quest-log.md file. Track each bisect step and the final victory. You cannot participate in the hunt directly."
+                    }
+                ],
+                tools: "Git (bisect start, bisect good, bisect bad, testing), VS Code (running tests), file documentation",
+                success: "Successfully identify the exact commit that introduced the regression and tag it as 'DRAGON_SLAIN'",
+                timeLimit: 35
+            },
+            {
+                id: 13,
+                title: "SSH Secure Infiltration",
+                difficulty: "moderate",
+                scenario: "Agent, your mission is to infiltrate the enemy's secure server using SSH protocols! 🕴️ Your team must coordinate a precision cyber-operation to extract classified files without triggering security alarms!",
+                tasks: [
+                    {
+                        role: "📡 Command Center",
+                        description: "Monitor the SSH connection and guide the field operative with specific commands. You have the infiltration manual but cannot access the remote system directly."
+                    },
+                    {
+                        role: "🥷 Field Operative",
+                        description: "Execute SSH commands and navigate the remote system based on Command Center's instructions. Report your findings but don't make independent decisions."
+                    },
+                    {
+                        role: "💾 Intelligence Analyst",
+                        description: "Analyze extracted files locally and create a mission-report.md. You cannot access the remote system but must process all intelligence gathered."
+                    }
+                ],
+                tools: "SSH (remote connections, file transfer), Linux terminal (remote navigation), file analysis, secure communication",
+                success: "Successfully extract target files via SSH and compile complete intelligence report with mission status 'INFILTRATION_SUCCESS'",
+                timeLimit: 25
+            },
+            {
+                id: 14,
+                title: "Revert Reality Paradox",
+                difficulty: "hard",
+                scenario: "Time itself has been corrupted by a rogue git commit! ⏰ Reality is glitching, and your team of time agents must use git revert and reset commands to restore the timeline before the universe crashes!",
+                tasks: [
+                    {
+                        role: "⏳ Time Guardian",
+                        description: "Analyze the git timeline and identify which commits need to be reverted to fix reality. You can see the timeline but cannot execute time manipulation commands."
+                    },
+                    {
+                        role: "🌀 Temporal Engineer",
+                        description: "Execute git revert and reset operations as directed by the Time Guardian. One wrong move could shatter reality permanently - be precise!"
+                    },
+                    {
+                        role: "📝 Reality Scribe",
+                        description: "Document each timeline change and its effects in a paradox-resolution-log.md file. Monitor for any remaining temporal anomalies."
+                    }
+                ],
+                tools: "Git (revert, reset, reflog, timeline analysis), VS Code (history viewing), timeline documentation",
+                success: "Successfully restore the timeline and create a temporal stability report confirming 'REALITY_RESTORED'",
+                timeLimit: 30
+            },
+            {
+                id: 15,
+                title: "Alias Adventure Workshop",
+                difficulty: "easy",
+                scenario: "Welcome to the Magical Alias Workshop! 🪄 A mysterious wizard has challenged your team to create the most powerful command aliases that will grant you incredible terminal abilities!",
+                tasks: [
+                    {
+                        role: "🧙 Alias Wizard",
+                        description: "Design creative and useful bash aliases for common tasks. You know the magic formulas but cannot create the aliases yourself - dictate them to your apprentice."
+                    },
+                    {
+                        role: "👨‍🎓 Apprentice",
+                        description: "Create the aliases in .bashrc/.zshrc as instructed by the Wizard. Test each alias to ensure it works properly. You cannot design aliases independently."
+                    },
+                    {
+                        role: "📜 Spell Keeper",
+                        description: "Document all created aliases in a magical-aliases.md file with explanations of what each spell (alias) does. Create usage examples for each."
+                    }
+                ],
+                tools: "Linux terminal (alias creation, .bashrc/.zshrc editing), Vim/Nano (configuration editing), command testing",
+                success: "Create at least 10 useful aliases, test them all, and document them in a complete spell book with examples",
+                timeLimit: 20
+            },
+            {
+                id: 16,
+                title: "Cherry-Pick Championship",
+                difficulty: "moderate",
+                scenario: "The Annual Git Cherry-Pick Championship has begun! 🍒 Your team must selectively harvest the finest commits from different branches to create the perfect garden of code. But beware - one wrong cherry and the whole garden wilts!",
+                tasks: [
+                    {
+                        role: "🌳 Orchard Master",
+                        description: "Identify which commits are the ripest cherries worth picking from various branches. You can examine the orchard but cannot pick cherries yourself - guide your pickers wisely."
+                    },
+                    {
+                        role: "🍒 Cherry Picker",
+                        description: "Execute git cherry-pick commands based on the Orchard Master's selections. Handle any conflicts that arise during the picking process."
+                    },
+                    {
+                        role: "📦 Harvest Coordinator",
+                        description: "Organize the picked cherries and create a harvest-report.md documenting which commits were selected and why. Package the final harvest for delivery."
+                    }
+                ],
+                tools: "Git (cherry-pick, branch management, conflict resolution), VS Code (commit viewing, editing), documentation",
+                success: "Successfully cherry-pick at least 5 commits from different branches and create a comprehensive harvest report",
+                timeLimit: 24
+            },
+            {
+                id: 17,
+                title: "Process Monitoring Space Station",
+                difficulty: "easy",
+                scenario: "Houston, we have a problem! 🚀 The space station's processes are going haywire, and your mission control team must monitor and manage them using top, htop, and ps commands before life support fails!",
+                tasks: [
+                    {
+                        role: "🛰️ Mission Commander",
+                        description: "Monitor overall system health using htop and identify problematic processes. You can observe but cannot take direct action - coordinate your crew's responses."
+                    },
+                    {
+                        role: "👨‍🚀 Systems Engineer",
+                        description: "Execute process management commands (kill, killall, jobs) based on Commander's analysis. You cannot monitor processes yourself, only act on orders."
+                    },
+                    {
+                        role: "📊 Flight Recorder",
+                        description: "Log all process management actions in space-station-log.md and monitor system recovery. Create status reports throughout the mission."
+                    }
+                ],
+                tools: "Linux terminal (htop, top, ps, kill, jobs), system monitoring, process management, documentation",
+                success: "Stabilize all critical processes and create a complete mission log showing successful system recovery",
+                timeLimit: 18
+            },
+            {
+                id: 18,
+                title: "Diff Detective Case Files",
+                difficulty: "moderate",
+                scenario: "The Code Crimes Unit needs your expertise! 🔍 Someone has been making unauthorized changes to critical files, and your forensics team must use diff and git diff commands to build an ironclad case!",
+                tasks: [
+                    {
+                        role: "🕵️ Lead Forensics Investigator",
+                        description: "Analyze file differences using various diff commands to identify what changes were made. You can examine evidence but cannot document findings directly."
+                    },
+                    {
+                        role: "🔬 Evidence Technician",
+                        description: "Execute diff commands as directed by the Lead Investigator and capture output to evidence files. You cannot interpret findings, only collect data."
+                    },
+                    {
+                        role: "⚖️ Case Attorney",
+                        description: "Compile all evidence into a legal-case-file.md that proves exactly what changes were made and when. Build a timeline of the digital crime."
+                    }
+                ],
+                tools: "Git (diff, log, show), Linux terminal (diff, comm, cmp), VS Code (file comparison), legal documentation",
+                success: "Build a complete legal case file with all evidence of changes and create a timeline proving the digital crime",
+                timeLimit: 26
+            },
+            {
+                id: 19,
+                title: "Remote Repository Rescue Mission",
+                difficulty: "hard",
+                scenario: "MAYDAY! MAYDAY! 🆘 A critical remote repository has become corrupted during a space mission to Mars. Your rescue team must coordinate a complex operation using git remote commands to restore communications and save the mission!",
+                tasks: [
+                    {
+                        role: "🚀 Mission Control",
+                        description: "Coordinate the rescue operation by analyzing remote repository status and planning the recovery strategy. You cannot execute git commands directly - rely on your astronauts."
+                    },
+                    {
+                        role: "👨‍🚀 Space Engineer",
+                        description: "Execute git remote commands (add, remove, set-url, show) and manage repository connections. Work under pressure with limited communication windows."
+                    },
+                    {
+                        role: "📡 Communications Officer",
+                        description: "Monitor connection status and document all rescue operations in mars-rescue-log.md. Verify successful data transmission between Earth and Mars repos."
+                    }
+                ],
+                tools: "Git (remote, fetch, push, pull, clone), VS Code (repository management), network troubleshooting, space communication protocols",
+                success: "Successfully restore remote repository connections and transmit complete rescue log confirming 'MARS_MISSION_SAVED'",
+                timeLimit: 32
+            },
+            {
+                id: 20,
+                title: "Ultimate Code Ninja Dojo",
+                difficulty: "hard",
+                scenario: "Welcome to the final trial, young padawan! 🥷 The Ultimate Code Ninja Dojo will test everything you've learned. Your team must complete a gauntlet of challenges using ALL tools and techniques in perfect harmony. Only true code ninjas will emerge victorious!",
+                tasks: [
+                    {
+                        role: "🥋 Sensei Master",
+                        description: "Guide your students through the ultimate trial by coordinating the use of all tools: Git, VS Code, Linux terminal, vim, tmux, and more. You cannot execute commands - only provide wisdom and strategy."
+                    },
+                    {
+                        role: "🗾 Shadow Ninja",
+                        description: "Execute complex command sequences combining multiple tools simultaneously. You must work in perfect synchronization with your partner while following the Sensei's guidance."
+                    },
+                    {
+                        role: "⚡ Lightning Ninja",
+                        description: "Complement the Shadow Ninja's actions with parallel operations. Together you must achieve perfect technical harmony while documenting the entire trial."
+                    }
+                ],
+                tools: "ALL TOOLS: Git (advanced commands), VS Code (all features), Linux terminal (expert level), Vim, Tmux, SSH, process management, file manipulation",
+                success: "Complete the 7-stage ninja trial using all tools masterfully and create the ultimate ninja-mastery-certificate.md proving your worthiness",
+                timeLimit: 45
+            }
+        ];
+
+        let currentChallenge = 0;
+        let timerInterval;
+        let timeRemaining = 0;
+
+        function initializeApp() {
+            populateChallengelist();
+            showChallenge(0);
+        }
+
+        function populateChallengelist() {
+            const challengeList = document.getElementById('challengeList');
+            
+            challenges.forEach((challenge, index) => {
+                const li = document.createElement('li');
+                li.className = 'challenge-item';
+                li.onclick = () => showChallenge(index + 1);
+                
+                li.innerHTML = `
+                    <div class="challenge-number">Challenge #${challenge.id}</div>
+                    <div class="challenge-title">${challenge.title}</div>
+                    <div class="challenge-difficulty">
+                        <span class="difficulty-badge ${challenge.difficulty}">${challenge.difficulty.toUpperCase()}</span>
+                        ⏱️ ${challenge.timeLimit}min
+                    </div>
+                `;
+                
+                challengeList.appendChild(li);
+            });
+        }
+
+        function showChallenge(index) {
+            // Hide all content
+            document.querySelectorAll('.challenge-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all challenge items
+            document.querySelectorAll('.challenge-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (index === 0) {
+                // Show welcome screen
+                document.getElementById('welcome').classList.add('active');
+                currentChallenge = 0;
+            } else {
+                // Show specific challenge
+                const challenge = challenges[index - 1];
+                currentChallenge = index;
+                
+                // Add active class to current challenge item
+                const challengeItems = document.querySelectorAll('.challenge-item');
+                if (challengeItems[index - 1]) {
+                    challengeItems[index - 1].classList.add('active');
+                }
+                
+                // Create and show challenge content
+                showChallengeContent(challenge);
+            }
+            
+            updateProgress();
+            stopTimer();
+        }
+
+        function showChallengeContent(challenge) {
+            const contentArea = document.getElementById('contentArea');
+            
+            // Create roles HTML
+            const rolesHTML = challenge.tasks.map(task => `
+                <div class="role">
+                    <h4>${task.role}</h4>
+                    <p>${task.description}</p>
+                </div>
+            `).join('');
+            
+            const challengeHTML = `
+                <div class="challenge-content active" id="challenge-${challenge.id}">
+                    <h1>🎮 Challenge #${challenge.id}: ${challenge.title}</h1>
+                    <span class="difficulty-badge ${challenge.difficulty}">${challenge.difficulty.toUpperCase()}</span>
+                    <span style="margin-left: 15px;">⏱️ Time Limit: ${challenge.timeLimit} minutes</span>
+                    
+                    <div class="scenario-box">
+                        <h3>📖 Scenario</h3>
+                        <p>${challenge.scenario}</p>
+                    </div>
+                    
+                    <div class="task-box">
+                        <h3>🎯 Team Tasks</h3>
+                        ${rolesHTML}
+                    </div>
+                    
+                    <div class="tools-box">
+                        <h3>🛠️ Tools Involved</h3>
+                        <p>${challenge.tools}</p>
+                    </div>
+                    
+                    <div class="success-box">
+                        <h3>✅ Success Criteria</h3>
+                        <p>${challenge.success}</p>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.innerHTML = challengeHTML;
+        }
+
+        function nextChallenge() {
+            if (currentChallenge < challenges.length) {
+                showChallenge(currentChallenge + 1);
+            }
+        }
+
+        function previousChallenge() {
+            if (currentChallenge > 0) {
+                showChallenge(currentChallenge - 1);
+            }
+        }
+
+        function startTimer() {
+            if (currentChallenge === 0) {
+                alert('Please select a challenge first!');
+                return;
+            }
+            
+            const challenge = challenges[currentChallenge - 1];
+            timeRemaining = challenge.timeLimit * 60; // Convert to seconds
+            
+            document.getElementById('timer').style.display = 'block';
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    stopTimer();
+                    alert('⏰ Time\'s up! Mission failed... or did it? 🤔');
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('timer').style.display = 'none';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timeLeft').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            const progress = (currentChallenge / challenges.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextChallenge();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousChallenge();
+            } else if (e.key === 'Escape') {
+                showChallenge(0);
+            }
+        });
+
+        // Initialize the app
+        initializeApp();
+    </script>
+</body>
+</html>
