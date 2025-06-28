@@ -1,4 +1,4 @@
-# 🎮 Interactive Coding Challenges
+# 🎮 Interactive Coding Challenge
 
 ## Overview
 
